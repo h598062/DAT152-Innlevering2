@@ -67,11 +67,31 @@ public class BookController {
 		
 		return new ResponseEntity<>(nbook, HttpStatus.CREATED);
 	}
-	
+
+	// TODO - updateBookByISBN (@Mappings, URI, and method)
+	@PutMapping("/books/{isbn}")
+	public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable("isbn") String isbn) throws BookNotFoundException {
+		book.setIsbn(isbn);
+
+		Book updateBook = bookService.updateBook(book);
+
+		if(updateBook != null) {
+			return ResponseEntity.ok(updateBook);
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	// TODO - deleteBookByISBN (@Mappings, URI, and method)
+	@DeleteMapping("/books/{isbn}")
+	public ResponseEntity<Void> deleteBook(@PathVariable("isbn") String isbn) throws BookNotFoundException {
+		bookService.deleteBookByISBN(isbn);
+		return ResponseEntity.noContent().build();
+	}
+
 	// TODO - getAuthorsOfBookByISBN (@Mappings, URI, and method)
 	
-	// TODO - updateBookByISBN (@Mappings, URI, and method)
-	
-	// TODO - deleteBookByISBN (@Mappings, URI, and method)
+
+
 
 }
