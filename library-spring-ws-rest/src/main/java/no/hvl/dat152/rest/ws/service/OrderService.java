@@ -1,11 +1,12 @@
 /**
- * 
+ *
  */
 package no.hvl.dat152.rest.ws.service;
 
 import java.util.List;
 
 import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,28 +24,68 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
-	
+
+	/**
+	 * @param order
+	 *
+	 * @return
+	 */
 	public Order saveOrder(Order order) {
-		
 		order = orderRepository.save(order);
-		
 		return order;
 	}
-	
+
+	/**
+	 * @param id
+	 *
+	 * @return
+	 *
+	 * @throws OrderNotFoundException
+	 */
 	public Order findOrder(Long id) throws OrderNotFoundException {
-		
-		Order order = orderRepository.findById(id)
-				.orElseThrow(()-> new OrderNotFoundException("Order with id: "+id+" not found in the order list!"));
-		
-		return order;
+		return orderRepository.findById(id)
+		                      .orElseThrow(() -> new OrderNotFoundException(
+				                      "Order with id: " + id + " not found in the order list!"));
 	}
-	
-	// TODO public void deleteOrder(Long id)
-	
-	// TODO public List<Order> findAllOrders()
-	
-	// TODO public List<Order> findByExpiryDate(LocalDate expiry, Pageable page)
-	
-	// TODO public Order updateOrder(Order order, Long id)
+
+	/**
+	 * @param id
+	 */
+	public void deleteOrder(Long id) throws OrderNotFoundException {
+		Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(
+				"Order with id: " + id + " not found in the order list!"));
+		orderRepository.delete(order);
+	}
+
+	/**
+	 * @return
+	 */
+	public List<Order> findAllOrders() {
+		return orderRepository.findAll();
+	}
+
+	/**
+	 * @param expiry
+	 * @param page
+	 *
+	 * @return
+	 */
+	public List<Order> findByExpiryDate(LocalDate expiry, Pageable page) {
+		// TODO
+		return List.of();
+	}
+
+	/**
+	 * @param order
+	 * @param id
+	 *
+	 * @return
+	 *
+	 * @throws OrderNotFoundException
+	 */
+	public Order updateOrder(Order order, Long id) throws OrderNotFoundException {
+		findOrder(id);
+		return saveOrder(order);
+	}
 
 }

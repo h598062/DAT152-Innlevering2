@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package no.hvl.dat152.rest.ws.controller;
 
@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.hvl.dat152.rest.ws.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,12 +38,38 @@ import no.hvl.dat152.rest.ws.service.OrderService;
 @RequestMapping("/elibrary/api/v1")
 public class OrderController {
 
-	// TODO - getAllBorrowOrders (@Mappings, URI=/orders, and method) + filter by expiry and paginate 
-	
+	@Autowired
+	OrderService orderService;
+
+	// TODO - getAllBorrowOrders (@Mappings, URI=/orders, and method) + filter by expiry and paginate
+	@GetMapping("/orders")
+	public ResponseEntity<List<Order>> getAllBorrowOrders() {
+		return ResponseEntity.ok(orderService.findAllOrders());
+	}
+
 	// TODO - getBorrowOrder (@Mappings, URI=/orders/{id}, and method)
-	
-	// TODO - updateOrder (@Mappings, URI=/orders/{id}, and method)
-	
+	@GetMapping("/orders/{id}")
+	public ResponseEntity<Order> getBorrowOrder(@PathVariable Long id) throws OrderNotFoundException {
+		return ResponseEntity.ok(orderService.findOrder(id));
+	}
+
+	@PutMapping("/orders/{id}")
+	public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order) {
+		try {
+			return ResponseEntity.ok(orderService.updateOrder(order, id));
+		} catch (OrderNotFoundException e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
 	// TODO - deleteBookOrder (@Mappings, URI=/orders/{id}, and method)
-	
+	@DeleteMapping("/orders/{id}")
+	public ResponseEntity<Order> deleteBookOrder(@PathVariable Long id) {
+		try {
+			orderService.deleteOrder(id);
+			return ResponseEntity.ok().build();
+		} catch (OrderNotFoundException e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
 }
