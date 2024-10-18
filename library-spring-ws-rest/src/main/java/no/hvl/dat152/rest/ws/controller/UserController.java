@@ -3,22 +3,22 @@
  */
 package no.hvl.dat152.rest.ws.controller;
 
-import java.util.List;
-import java.util.Set;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
+import no.hvl.dat152.rest.ws.exceptions.OrderNotFoundException;
+import no.hvl.dat152.rest.ws.exceptions.UserNotFoundException;
+import no.hvl.dat152.rest.ws.model.Order;
+import no.hvl.dat152.rest.ws.model.User;
+import no.hvl.dat152.rest.ws.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import no.hvl.dat152.rest.ws.exceptions.OrderNotFoundException;
-import no.hvl.dat152.rest.ws.exceptions.UserNotFoundException;
-import no.hvl.dat152.rest.ws.model.Order;
-import no.hvl.dat152.rest.ws.model.User;
-import no.hvl.dat152.rest.ws.service.UserService;
+import java.util.List;
+import java.util.Set;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author tdoy
@@ -103,8 +103,23 @@ public class UserController {
 	@PostMapping("/users/{uid}/orders")
 	public ResponseEntity<User> createUserOrder(@PathVariable("uid") Long uid, @RequestBody Order order) {
 		try {
-			return new ResponseEntity<>(userService.createOrdersForUser(uid, order), HttpStatus.CREATED);
-		} catch (UserNotFoundException e) {
+			User user = userService.createOrdersForUser(uid, order);
+			for (final Order o : user.getOrders()) {
+				Link ln1 = linkTo(methodOn(OrderController.class)
+						.updateOrder(o.getId(), order)).withRel("update");
+				Link ln2 = linkTo(methodOn(UserController.class)
+						.deleteUserOrder(user.getUserid(), o.getId())).withRel("delete");
+				Link ln3 = linkTo(methodOn(UserController.class)
+						.getUserOrder(user.getUserid(), o.getId())).withSelfRel();
+				Link ln4 = linkTo(methodOn(OrderController.class)
+						.getBorrowOrder(o.getId())).withSelfRel();
+				o.add(ln1);
+				o.add(ln2);
+				o.add(ln3);
+				o.add(ln4);
+			}
+			return new ResponseEntity<>(user, HttpStatus.CREATED);
+		} catch (UserNotFoundException | OrderNotFoundException e) {
 			return ResponseEntity.notFound().build();
 		}
 	}

@@ -1,0 +1,17 @@
+### GET request to example server
+POST localhost:8090/elibrary/api/v1/users/1/orders
+Accept: application/json
+Content-Type: application/json
+
+{
+  "isbn": "abcde12344",
+  "expiry": "2024-10-17"
+}
+###
+
+GET localhost:8090/elibrary/api/v1/orders/4
+Accept: application/json
+###
+
+GET localhost:8090/elibrary/api/v1/orders?expiry=2024-11-10&page=1&size=2
+Accept: application/json

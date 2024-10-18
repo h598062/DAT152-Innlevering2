@@ -71,9 +71,8 @@ public class OrderService {
 	 * @return
 	 */
 	public List<Order> findByExpiryDate(LocalDate expiry, Pageable page) {
-		// TODO
-		return List.of();
-	}
+		return orderRepository.findByExpiryBefore(expiry, page).get().toList();
+		}
 
 	/**
 	 * @param order
