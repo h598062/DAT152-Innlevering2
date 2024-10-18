@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import java.util.List;
 /**
  * @author tdoy
  */
+@PreAuthorize("hasAuthority('ADMIN')")
 @RestController
 @RequestMapping("/elibrary/api/v1")
 public class OrderController {
@@ -25,7 +27,7 @@ public class OrderController {
 	@Autowired
 	OrderService orderService;
 
-	// TODO - getAllBorrowOrders (@Mappings, URI=/orders, and method) + filter by expiry and paginate
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/orders")
 	public ResponseEntity<List<Order>> getAllBorrowOrders(
 			@RequestParam(name = "expiry", required = false) LocalDate expiry,
@@ -39,7 +41,7 @@ public class OrderController {
 		}
 	}
 
-	// TODO - getBorrowOrder (@Mappings, URI=/orders/{id}, and method)
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/orders/{id}")
 	public ResponseEntity<Order> getBorrowOrder(@PathVariable Long id) throws OrderNotFoundException {
 		return ResponseEntity.ok(orderService.findOrder(id));
@@ -54,7 +56,6 @@ public class OrderController {
 		}
 	}
 
-	// TODO - deleteBookOrder (@Mappings, URI=/orders/{id}, and method)
 	@DeleteMapping("/orders/{id}")
 	public ResponseEntity<Order> deleteBookOrder(@PathVariable Long id) {
 		try {

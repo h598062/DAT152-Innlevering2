@@ -131,10 +131,11 @@ public class UserService {
 	 *
 	 * @throws UserNotFoundException If the user is not found
 	 */
-	public User createOrdersForUser(Long userid, Order order) throws UserNotFoundException {
+	public Order createOrdersForUser(Long userid, Order order) throws UserNotFoundException {
 		User  user       = findUser(userid);
 		Order savedOrder = orderService.saveOrder(order);
 		user.addOrder(savedOrder);
-		return userRepository.save(user);
+		userRepository.save(user);
+		return savedOrder;
 	}
 }

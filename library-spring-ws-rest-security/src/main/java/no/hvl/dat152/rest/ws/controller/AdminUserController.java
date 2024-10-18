@@ -22,6 +22,7 @@ import no.hvl.dat152.rest.ws.service.AdminUserService;
 /**
  * @author tdoy
  */
+@PreAuthorize("hasAuthority('ADMIN')")
 @RestController
 @RequestMapping("/elibrary/api/v1/admin")
 public class AdminUserController {
@@ -30,8 +31,7 @@ public class AdminUserController {
 	private AdminUserService userService;
 	
 	@PutMapping("/users/{id}")
-	// TODO authority annotation
-	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String role) 
+	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String role)
 			throws UserNotFoundException{
 		
 		// TODO
@@ -40,8 +40,7 @@ public class AdminUserController {
 	}
 	
 	@DeleteMapping("/users/{id}")
-	// TODO authority annotation
-	public ResponseEntity<Object> deleteUserRole(@PathVariable("id") Long id, 
+	public ResponseEntity<Object> deleteUserRole(@PathVariable("id") Long id,
 			@RequestParam("role") String role) throws UserNotFoundException{
 		
 		// TODO

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 /**
  * @author tdoy
  */
+@PreAuthorize("hasAuthority('ADMIN')")
 @RestController
 @RequestMapping("/elibrary/api/v1")
 public class UserController {
@@ -42,6 +44,7 @@ public class UserController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping(value = "/users/{id}")
 	public ResponseEntity<Object> getUser(@PathVariable("id") Long id) throws
 			UserNotFoundException,
@@ -52,6 +55,7 @@ public class UserController {
 		return new ResponseEntity<>(user, HttpStatus.OK);
 
 	}
+
 
 	@PostMapping("/users")
 	public ResponseEntity<User> createUser(@RequestBody User user) {
@@ -74,12 +78,13 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 
-
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/users/{id}/orders")
 	public ResponseEntity<Set<Order>> getUserOrders(@PathVariable("id") Long id) throws UserNotFoundException {
 		return ResponseEntity.ok(userService.getUserOrders(id));
 	}
 
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/users/{uid}/orders/{oid}")
 	public ResponseEntity<Order> getUserOrder(@PathVariable("uid") Long uid, @PathVariable("oid") Long oid) {
 		try {
@@ -89,6 +94,7 @@ public class UserController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('USER')")
 	@DeleteMapping("/users/{uid}/orders/{oid}")
 	public ResponseEntity<Order> deleteUserOrder(@PathVariable("uid") Long uid, @PathVariable("oid") Long oid) {
 		try {
@@ -99,26 +105,26 @@ public class UserController {
 		}
 	}
 
-	// TODO - HATEOAS links
+	@PreAuthorize("hasAuthority('USER')")
 	@PostMapping("/users/{uid}/orders")
-	public ResponseEntity<User> createUserOrder(@PathVariable("uid") Long uid, @RequestBody Order order) {
+	public ResponseEntity<Order> createUserOrder(@PathVariable("uid") Long uid, @RequestBody Order order) {
 		try {
-			User user = userService.createOrdersForUser(uid, order);
-			for (final Order o : user.getOrders()) {
-				Link ln1 = linkTo(methodOn(OrderController.class)
-						.updateOrder(o.getId(), order)).withRel("update");
-				Link ln2 = linkTo(methodOn(UserController.class)
-						.deleteUserOrder(user.getUserid(), o.getId())).withRel("delete");
-				Link ln3 = linkTo(methodOn(UserController.class)
-						.getUserOrder(user.getUserid(), o.getId())).withSelfRel();
-				Link ln4 = linkTo(methodOn(OrderController.class)
-						.getBorrowOrder(o.getId())).withSelfRel();
-				o.add(ln1);
-				o.add(ln2);
-				o.add(ln3);
-				o.add(ln4);
-			}
-			return new ResponseEntity<>(user, HttpStatus.CREATED);
+			Order savedOrder = userService.createOrdersForUser(uid, order);
+
+			Link ln1 = linkTo(methodOn(OrderController.class)
+					.updateOrder(savedOrder.getId(), order)).withRel("update");
+			Link ln2 = linkTo(methodOn(UserController.class)
+					.deleteUserOrder(uid, savedOrder.getId())).withRel("delete");
+			Link ln3 = linkTo(methodOn(UserController.class)
+					.getUserOrder(uid, savedOrder.getId())).withSelfRel();
+			Link ln4 = linkTo(methodOn(OrderController.class)
+					.getBorrowOrder(savedOrder.getId())).withSelfRel();
+			savedOrder.add(ln1);
+			savedOrder.add(ln2);
+			savedOrder.add(ln3);
+			savedOrder.add(ln4);
+
+			return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
 		} catch (UserNotFoundException | OrderNotFoundException e) {
 			return ResponseEntity.notFound().build();
 		}

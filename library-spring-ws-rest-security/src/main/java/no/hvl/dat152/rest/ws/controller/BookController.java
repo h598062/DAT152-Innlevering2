@@ -10,6 +10,7 @@ import no.hvl.dat152.rest.ws.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Set;
 /**
  * @author tdoy
  */
+@PreAuthorize("hasAuthority('ADMIN')")
 @RestController
 @RequestMapping("/elibrary/api/v1")
 public class BookController {
@@ -29,6 +31,7 @@ public class BookController {
 	 *
 	 * @return
 	 */
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/books")
 	public ResponseEntity<Object> getAllBooks() {
 
@@ -47,6 +50,7 @@ public class BookController {
 	 * @return
 	 * @throws BookNotFoundException
 	 */
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/books/{isbn}")
 	public ResponseEntity<Object> getBook(@PathVariable("isbn") String isbn) throws BookNotFoundException {
 
@@ -107,6 +111,7 @@ public class BookController {
 	 * @param isbn
 	 * @return
 	 */
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/books/{isbn}/authors")
 	public ResponseEntity<Set<Author>> getAuthorsOfBookByISBN(@PathVariable("isbn") String isbn) {
 		try {

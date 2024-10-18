@@ -101,24 +101,24 @@ public class UserController {
 
 	// TODO - HATEOAS links
 	@PostMapping("/users/{uid}/orders")
-	public ResponseEntity<User> createUserOrder(@PathVariable("uid") Long uid, @RequestBody Order order) {
+	public ResponseEntity<Order> createUserOrder(@PathVariable("uid") Long uid, @RequestBody Order order) {
 		try {
-			User user = userService.createOrdersForUser(uid, order);
-			for (final Order o : user.getOrders()) {
-				Link ln1 = linkTo(methodOn(OrderController.class)
-						.updateOrder(o.getId(), order)).withRel("update");
-				Link ln2 = linkTo(methodOn(UserController.class)
-						.deleteUserOrder(user.getUserid(), o.getId())).withRel("delete");
-				Link ln3 = linkTo(methodOn(UserController.class)
-						.getUserOrder(user.getUserid(), o.getId())).withSelfRel();
-				Link ln4 = linkTo(methodOn(OrderController.class)
-						.getBorrowOrder(o.getId())).withSelfRel();
-				o.add(ln1);
-				o.add(ln2);
-				o.add(ln3);
-				o.add(ln4);
-			}
-			return new ResponseEntity<>(user, HttpStatus.CREATED);
+			Order savedOrder = userService.createOrdersForUser(uid, order);
+
+			Link ln1 = linkTo(methodOn(OrderController.class)
+					.updateOrder(savedOrder.getId(), order)).withRel("update");
+			Link ln2 = linkTo(methodOn(UserController.class)
+					.deleteUserOrder(uid, savedOrder.getId())).withRel("delete");
+			Link ln3 = linkTo(methodOn(UserController.class)
+					.getUserOrder(uid, savedOrder.getId())).withSelfRel();
+			Link ln4 = linkTo(methodOn(OrderController.class)
+					.getBorrowOrder(savedOrder.getId())).withSelfRel();
+			savedOrder.add(ln1);
+			savedOrder.add(ln2);
+			savedOrder.add(ln3);
+			savedOrder.add(ln4);
+
+			return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
 		} catch (UserNotFoundException | OrderNotFoundException e) {
 			return ResponseEntity.notFound().build();
 		}
