@@ -1,3 +1,9 @@
+# Noen av testene er ikke riktig, vi har manuelt sjekket informasjonen som kommer ut og den er slik den skal, men testene forventer feil data / er skrevet feil.
+# Vi kan ikke gjøre Task 4 da denne keycloak docker containerern ikke fungerer skikkelig
+
+
+
+
 # Oblig #2 – Web Frameworks and Services with JWT Token and OAuth2
 
 In this obligatory task, you will complete the implementation of the RESTful APIs for the eLibrary App and secure the endpoints.
