@@ -13,4 +13,5 @@ import no.hvl.dat152.rest.ws.model.Role;
 public interface RoleRepository extends CrudRepository<Role, Integer> {
 	
 	Role findByName(String name);
+	Role findByNameIgnoreCase(String name);
 }

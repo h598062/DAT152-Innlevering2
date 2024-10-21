@@ -4,6 +4,8 @@
 package no.hvl.dat152.rest.ws.controller;
 
 
+import no.hvl.dat152.rest.ws.model.Role;
+import no.hvl.dat152.rest.ws.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,23 +31,29 @@ public class AdminUserController {
 
 	@Autowired
 	private AdminUserService userService;
-	
+	@Autowired
+	private RoleService      roleService;
+
 	@PutMapping("/users/{id}")
-	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String role)
+	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String roleName)
 			throws UserNotFoundException{
 		
-		// TODO
-		
-		return null;
+		User user = userService.findUser(id);
+		Role role = roleService.findRoleByName(roleName);
+
+		user.addRole(role);
+		return ResponseEntity.ok(userService.saveUser(user));
 	}
 	
 	@DeleteMapping("/users/{id}")
 	public ResponseEntity<Object> deleteUserRole(@PathVariable("id") Long id,
 			@RequestParam("role") String role) throws UserNotFoundException{
-		
-		// TODO
-		
-		return null;
+
+		User user = userService.findUser(id);
+		Role foundRole = roleService.findRoleByName(role);
+
+		user.removeRole(foundRole);
+		return ResponseEntity.ok(userService.saveUser(user));
 	}
 	
 }
