@@ -72,7 +72,7 @@ class TestOrder {
 		
 	    Response response = RestAssured.given()
 				.header("Authorization", "Bearer "+ SUPER_ADMIN_TOKEN)
-	    		.get(API_ROOT+"/orders/{id}", 2);
+	    		.get(API_ROOT+"/orders/{id}", 1);
 	    
 	    assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 	    assertEquals("ghijk1234", response.jsonPath().get("isbn"));
