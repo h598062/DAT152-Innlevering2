@@ -27,7 +27,6 @@ public class OrderController {
 	@Autowired
 	OrderService orderService;
 
-	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/orders")
 	public ResponseEntity<List<Order>> getAllBorrowOrders(
 			@RequestParam(name = "expiry", required = false) LocalDate expiry,
