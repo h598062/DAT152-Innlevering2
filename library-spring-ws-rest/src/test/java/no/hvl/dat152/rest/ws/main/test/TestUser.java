@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,12 +125,17 @@ class TestUser {
 				.body(order)
 				.post(API_ROOT+"/users/{id}/orders", "2");
 
-		List<Object> isbns = response.jsonPath().getList("isbn");
-		List<Object> hrefs = response.jsonPath().getList("links");
-		
+		// We made this endpoint only return the new order, not a list of orders
+
+		String isbn = response.jsonPath().get("isbn").toString();
+		// List<Object> isbns = jsojd.getList("isbn"); // this is wrong, it only returns a single value, not a list
+		// List<Object> hrefs = response.jsonPath().getList("links"); // the correct for this should be "_links" according to out api testing
+		var hrefs = response.jsonPath().getMap("_links.update");
+		//String href = response.jsonPath().get("links").toString();
 	    assertEquals(HttpStatus.CREATED.value(), response.getStatusCode());
-	    assertTrue(isbns.contains("rstuv1540"));
-	    assertTrue(hrefs.get(0).toString().contains("href"));
+	    // assertTrue(isbns.contains("rstuv1540")); // have to change this to check for single value
+		assertEquals("rstuv1540", isbn);
+	    assertTrue(hrefs.containsKey("href")); // have to change this aswell
 
 	}
 	
